@@ -1,0 +1,32 @@
+---
+- hosts: all
+  become: true
+  vars:
+    motd_text: "Ansible Managed node by zamora"
+  
+  tasks: 
+
+  - name: install python3, pip3, and Java open-jdk packages for Ubuntu
+    apt:
+      name:
+        - python3-pip
+        - default-jdk
+      state: latest
+      update_cache: yes
+    when: ansible_distribution == "Ubuntu"
+
+  - name: install python3, pip3, and Java open-jdk packages for CentOS
+    dnf:
+      name:
+        - python3-pip
+        - java-11-openjdk-devel
+      state: latest
+      update_cache: yes
+    when: ansible_distribution == "CentOS"
+
+  - name: Create MotD in Ubuntu and CentOS
+    template:
+      src: motd.j2
+      dest: /etc/motd
+    notify: Reload MOTD
+
